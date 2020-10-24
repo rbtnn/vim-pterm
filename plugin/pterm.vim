@@ -2,7 +2,7 @@
 
 let g:loaded_pterm = 1
 
-if has('nvim')
+if has('nvim') || !has('popupwin')
   finish
 endif
 
