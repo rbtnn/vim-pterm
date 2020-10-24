@@ -8,8 +8,16 @@ This plugin provides to open and hide terminal in popupwin.
 ## Usage
 
 ### :PTermOpen[!] [{terminal-bufnr}]
-With bang or not set {terminal-bufnr}: Open a new terminal in a popup window.  
-Set {terminal-bufnr}: Open {terminal-bufnr} in a popup window.  
+With bang:  
+  Open a new terminal in a popup window.  
+
+Not set {terminal-bufnr}:  
+  Open the first of existing terminal-buffers in a popup window.   
+  If does not exist, open a new terminal in a popup window.  
+
+Set {terminal-bufnr}:  
+  Open {terminal-bufnr} in a popup window.  
+
 Height of the popup window is `eval(get(g:, 'pterm_height', '&lines * 2 / 3'))`.  
 Width of the popup window is `eval(get(g:, 'pterm_width', '&columns * 2 / 3'))`.  
 
