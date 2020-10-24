@@ -12,3 +12,4 @@ if get(g:, 'pterm_default_keymappings', v:true)
   tnoremap <silent><C-z>   <C-w>:<C-u>PTermHide<cr>
   nnoremap <silent><C-z>   :<C-u>PTermOpen<cr>
 endif
+

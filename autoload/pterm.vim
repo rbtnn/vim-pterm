@@ -16,13 +16,11 @@ function! pterm#open(q_bang, q_args) abort
   endif
   if -1 != bnr
     call popup_create(bnr, #{
-      \   pos: 'topleft',
-      \   line: &lines / 4,
-      \   minheight: &lines / 2,
-      \   maxheight: &lines / 2,
-      \   col: &columns / 4,
-      \   minwidth: &columns / 2,
-      \   maxwidth: &columns / 2,
+      \   pos: 'center',
+      \   minheight: eval(get(g:, 'pterm_height', '&lines / 2')),
+      \   maxheight: eval(get(g:, 'pterm_height', '&lines / 2')),
+      \   minwidth: eval(get(g:, 'pterm_width', '&columns / 2')),
+      \   maxwidth: eval(get(g:, 'pterm_width', '&columns / 2')),
       \ })
     command! -buffer -nargs=0 PTermHide   call pterm#hide()
   endif
