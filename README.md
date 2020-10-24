@@ -5,7 +5,7 @@ This plugin provides to open and hide terminal in popupwin.
 
 ![](https://raw.githubusercontent.com/rbtnn/vim-pterm/main/pterm.gif)
 
-## Usage
+## Commands
 
 ### :PTermOpen[!] [{terminal-bufnr}]
 __With bang:__  
