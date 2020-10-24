@@ -1,6 +1,5 @@
 
 # vim-pterm
-
 This plugin provides to open and hide terminal in popupwin.  
 
 ![](https://raw.githubusercontent.com/rbtnn/vim-pterm/main/pterm.gif)
@@ -34,8 +33,14 @@ tnoremap <silent><C-z>   <C-w>:<C-u>PTermHide<cr>
 nnoremap <silent><C-z>   :<C-u>PTermOpen<cr>
 ```
 
-## Requirements
+## Installation
+This is an example of installation using [vim-plug](https://github.com/junegunn/vim-plug).
 
+```
+Plug 'rbtnn/vim-pterm'
+```
+
+## Requirements
 * Vim must be compiled with `+popupwin` feature
 
 ## License
