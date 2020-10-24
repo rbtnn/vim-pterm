@@ -35,7 +35,7 @@ function! pterm#hide() abort
   endif
 endfunction
 
-function! PTermComplete(ArgLead, CmdLine, CursorPos) abort
+function! pterm#complete(ArgLead, CmdLine, CursorPos) abort
   return map(term_list(), { i,x -> string(x) })
 endfunction
 

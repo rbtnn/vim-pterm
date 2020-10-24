@@ -6,7 +6,7 @@ if has('nvim') || !has('popupwin')
   finish
 endif
 
-command! -bang -nargs=? -complete=customlist,PTermComplete PTermOpen   call pterm#open(<q-bang>, <q-args>)
+command! -bang -nargs=? -complete=customlist,pterm#complete PTermOpen   call pterm#open(<q-bang>, <q-args>)
 
 if get(g:, 'pterm_default_keymappings', v:true)
   tnoremap <silent><C-z>   <C-w>:<C-u>PTermHide<cr>
