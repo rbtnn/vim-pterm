@@ -1,1 +1,2 @@
-# pterm.vim
+
+# vim-pterm
