@@ -12,7 +12,7 @@ __With bang:__
 
 __Not set {terminal-bufnr}:__  
   Open the first of existing terminal-buffers in a popup window.   
-  If does not exist, open a new terminal in a popup window.  
+  If terminal-buffer does not exist, open a new terminal in a popup window.  
 
 __Set {terminal-bufnr}:__  
   Open {terminal-bufnr} in a popup window.  
