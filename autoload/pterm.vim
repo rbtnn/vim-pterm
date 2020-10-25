@@ -1,27 +1,37 @@
 
-function! pterm#open(q_bang, q_args) abort
+function! pterm#open(q_bang, q_args, count) abort
   call pterm#hide()
   let bnr = -1
-  if empty(a:q_args)
-    if ('!' == a:q_bang) || empty(term_list())
-      let bnr = term_start([&shell], #{
+  if -1 != index(term_list(), a:count)
+    let bnr = a:count
+  else
+    let new_term = v:false
+    if ('!' == a:q_bang) || !empty(a:q_args)
+      let new_term = v:true
+    else
+      if empty(term_list())
+        let new_term = v:true
+      else
+        let bnr = term_list()[0]
+      endif
+    endif
+    if new_term
+      let args = empty(a:q_args) ? [&shell] : split(a:q_args, "\n")
+      let bnr = term_start(args, #{
         \   hidden: 1,
         \   term_finish: 'close',
         \ })
-    else
-      let bnr = term_list()[0]
     endif
-  elseif -1 != index(term_list(), str2nr(a:q_args))
-    let bnr = str2nr(a:q_args)
   endif
   if -1 != bnr
-    call popup_create(bnr, #{
+    let options = extend(#{
       \   pos: 'center',
       \   minheight: eval(get(g:, 'pterm_height', '&lines * 2 / 3')),
       \   maxheight: eval(get(g:, 'pterm_height', '&lines * 2 / 3')),
       \   minwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
       \   maxwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
-      \ })
+      \ }, get(g:, 'pterm_options', {}))
+    call popup_create(bnr, options)
     command! -buffer -nargs=0 PTermHide   call pterm#hide()
   endif
 endfunction
@@ -33,9 +43,5 @@ function! pterm#hide() abort
       call popup_close(winid)
     endif
   endif
-endfunction
-
-function! pterm#complete(ArgLead, CmdLine, CursorPos) abort
-  return map(term_list(), { i,x -> string(x) })
 endfunction
 
