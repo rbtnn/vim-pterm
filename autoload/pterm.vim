@@ -20,6 +20,7 @@ function! pterm#open(q_bang, q_args, count) abort
       let bnr = term_start(args, #{
         \   hidden: 1,
         \   term_finish: 'close',
+        \   term_kill: empty(a:q_args) ? 'term' : '',
         \ })
     endif
   endif
