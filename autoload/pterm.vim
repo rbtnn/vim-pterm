@@ -83,7 +83,7 @@ function! pterm#pin(hide, toggle) abort
   else
     let pos = popup_getpos(winid)
     call setwinvar(winid, 'pinned_winid', popup_create(printf('[Pinned:%d]', bufnr()), #{
-      \ highlight: 'TabLineSel',
+      \ highlight: 'PTermPin',
       \ line: pos['line'] - 1,
       \ col: pos['col'],
       \ }))
