@@ -6,6 +6,7 @@ function! pterm#open(q_bang, q_args, count) abort
 
   " Do not show pterm if current window is pterm.
   if reopen
+    let pinned_bnr = get(t:, 'pterm_pinned', 0)
     let bnr = -1
     if -1 != index(term_list(), a:count)
       let bnr = a:count
@@ -14,7 +15,6 @@ function! pterm#open(q_bang, q_args, count) abort
       if ('!' == a:q_bang) || !empty(a:q_args)
         let new_term = v:true
       else
-        let pinned_bnr = get(t:, 'pterm_pinned', 0)
         if empty(term_list())
           let new_term = v:true
         elseif -1 != index(term_list(), pinned_bnr)
@@ -40,22 +40,57 @@ function! pterm#open(q_bang, q_args, count) abort
         \   minwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
         \   maxwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
         \ }, get(g:, 'pterm_options', {}))
-      call popup_create(bnr, options)
+      let winid = popup_create(bnr, options)
+      if -1 != index(term_list(), pinned_bnr)
+        call pterm#pin(v:false, v:false)
+      endif
+      command! -buffer -nargs=0 PTermPin      call pterm#pin(v:false, v:true)
       command! -buffer -nargs=0 PTermHide     call pterm#hide()
-      command! -buffer -nargs=0 PTermPin      call pterm#pin()
     endif
   endif
 endfunction
 
 function! pterm#hide() abort
-  for winid in popup_list()
-    if get(getwininfo(winid), 0, { 'terminal' : v:false })['terminal']
-      call popup_close(winid)
-    endif
-  endfor
+  let winid = s:get_winid_of_pterm()
+  if 0 < winid
+    call pterm#pin(v:true, v:false)
+    call popup_close(winid)
+  endif
 endfunction
 
-function! pterm#pin() abort
-  let t:pterm_pinned = bufnr()
+function! pterm#pin(hide, toggle) abort
+  if a:toggle
+    let pinned_bnr = get(t:, 'pterm_pinned', 0)
+    if -1 != index(term_list(), pinned_bnr)
+      silent! unlet t:pterm_pinned
+    else
+      let t:pterm_pinned = bufnr()
+    endif
+  endif
+
+  let winid = s:get_winid_of_pterm()
+
+  if a:hide || !exists('t:pterm_pinned')
+    let pinned_winid = getwinvar(winid, 'pinned_winid', 0)
+    if 0 < pinned_winid
+      call popup_close(pinned_winid)
+    endif
+  else
+    let pos = popup_getpos(winid)
+    call setwinvar(winid, 'pinned_winid', popup_create(printf('[Pinned:%d]', bufnr()), #{
+      \ highlight: 'TabLineSel',
+      \ line: pos['line'] - 1,
+      \ col: pos['col'],
+      \ }))
+  endif
+endfunction
+
+function! s:get_winid_of_pterm() abort
+  for winid in popup_list()
+    if get(getwininfo(winid), 0, { 'terminal' : v:false })['terminal']
+      return winid
+    endif
+  endfor
+  return 0
 endfunction
 

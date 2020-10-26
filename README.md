@@ -34,8 +34,8 @@ Close the popup window opened by `:PTermOpen`.
 This command is defined only in a terminal buffer of `:PTermOpen`.  
 
 ### :PTermPin
-Pin the terminal-buffer to current tabpage.
-This command is defined only in a terminal buffer of `:PTermOpen`.
+Pin/Unpin the terminal-buffer to current tabpage.  
+This command is defined only in a terminal buffer of `:PTermOpen`.  
 
 ## Keymappings
 This plugin provides following keymappings. These keymappings can toggle it.  

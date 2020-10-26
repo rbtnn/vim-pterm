@@ -48,7 +48,7 @@ Commands                                                      *pterm-commands*
 
                                                                    *:PTermPin*
 :PTermPin
-		Pin the terminal-buffer to current tabpage.
+		Pin/Unpin the terminal-buffer to current tabpage.
 		This command is defined only in a terminal buffer of
 		|:PTermOpen|.
 
