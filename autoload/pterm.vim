@@ -1,9 +1,11 @@
 
 function! pterm#open(q_bang, q_args, count) abort
+  let reopen = (-1 == index(popup_list(), win_getid()))
+
   call pterm#hide()
 
   " Do not show pterm if current window is pterm, .
-  if -1 == index(popup_list(), win_getid())
+  if reopen
     let bnr = -1
     if -1 != index(term_list(), a:count)
       let bnr = a:count
