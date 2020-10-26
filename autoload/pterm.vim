@@ -29,6 +29,7 @@ function! pterm#open(q_bang, q_args, count) abort
           \   hidden: 1,
           \   term_finish: 'close',
           \   term_kill: empty(a:q_args) ? 'term' : '',
+          \   exit_cb: function('pterm#exit_cb'),
           \ })
       endif
     endif
@@ -48,6 +49,10 @@ function! pterm#open(q_bang, q_args, count) abort
       command! -buffer -nargs=0 PTermHide     call pterm#hide()
     endif
   endif
+endfunction
+
+function! pterm#exit_cb(ch, msg) abort
+  call pterm#hide()
 endfunction
 
 function! pterm#hide() abort
