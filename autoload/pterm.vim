@@ -4,7 +4,7 @@ function! pterm#open(q_bang, q_args, count) abort
 
   call pterm#hide()
 
-  " Do not show pterm if current window is pterm, .
+  " Do not show pterm if current window is pterm.
   if reopen
     let bnr = -1
     if -1 != index(term_list(), a:count)
