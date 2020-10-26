@@ -17,7 +17,7 @@ This plugin provides to open and hide terminal in a popup window.
     Open a new terminal of {arguments} in a popup window.  
     e.g. `:PTermOpen powershell`, `:PTermOpen sh`  
 
-4. __Pinned:__
+4. __Pinned:__  
     Open the terminal-buffer in a popup window if a pinned terminal-buffer exists.
 
 5. __Otherwise:__  
