@@ -48,7 +48,7 @@ Plug 'rbtnn/vim-pterm'
 
 ## Requirements
 * Vim must be compiled with `+popupwin` feature
-* Recommend Vim version 8.2.1900 or later
+* Vim version 8.2.1900 or above
 
 ## License
 Distributed under MIT License. See LICENSE.
