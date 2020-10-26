@@ -14,11 +14,11 @@ function! pterm#open(q_bang, q_args, count) abort
       if ('!' == a:q_bang) || !empty(a:q_args)
         let new_term = v:true
       else
-        let pinned_bnr = get(get(t:, 'pterm_pinned', []), 0, 0)
-        if -1 != index(term_list(), pinned_bnr)
-          let bnr = pinned_bnr
-        elseif empty(term_list())
+        let pinned_bnr = get(t:, 'pterm_pinned', 0)
+        if empty(term_list())
           let new_term = v:true
+        elseif -1 != index(term_list(), pinned_bnr)
+          let bnr = pinned_bnr
         else
           let bnr = term_list()[0]
         endif
@@ -42,7 +42,7 @@ function! pterm#open(q_bang, q_args, count) abort
         \ }, get(g:, 'pterm_options', {}))
       call popup_create(bnr, options)
       command! -buffer -nargs=0 PTermHide     call pterm#hide()
-      command! -buffer -nargs=0 PTermPinned   call pterm#pinned()
+      command! -buffer -nargs=0 PTermPin      call pterm#pin()
     endif
   endif
 endfunction
@@ -55,7 +55,7 @@ function! pterm#hide() abort
   endfor
 endfunction
 
-function! pterm#pinned() abort
-  let t:pterm_pinned = [bufnr()]
+function! pterm#pin() abort
+  let t:pterm_pinned = bufnr()
 endfunction
 
