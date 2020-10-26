@@ -14,7 +14,10 @@ function! pterm#open(q_bang, q_args, count) abort
       if ('!' == a:q_bang) || !empty(a:q_args)
         let new_term = v:true
       else
-        if empty(term_list())
+        let pinned_bnr = get(get(t:, 'pterm_pinned', []), 0, 0)
+        if -1 != index(term_list(), pinned_bnr)
+          let bnr = pinned_bnr
+        elseif empty(term_list())
           let new_term = v:true
         else
           let bnr = term_list()[0]
@@ -38,7 +41,8 @@ function! pterm#open(q_bang, q_args, count) abort
         \   maxwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
         \ }, get(g:, 'pterm_options', {}))
       call popup_create(bnr, options)
-      command! -buffer -nargs=0 PTermHide   call pterm#hide()
+      command! -buffer -nargs=0 PTermHide     call pterm#hide()
+      command! -buffer -nargs=0 PTermPinned   call pterm#pinned()
     endif
   endif
 endfunction
@@ -49,5 +53,9 @@ function! pterm#hide() abort
       call popup_close(winid)
     endif
   endfor
+endfunction
+
+function! pterm#pinned() abort
+  let t:pterm_pinned = [bufnr()]
 endfunction
 

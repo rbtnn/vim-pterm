@@ -3,13 +3,13 @@
 let g:loaded_pterm = 1
 
 if has('nvim')
-  echoerr 'This plugin does not support Neovim.'
+  echoerr '[pterm] This plugin does not support Neovim.'
   finish
 elseif !has('popupwin')
-  echoerr 'This plugin requires +popupwin feature.'
+  echoerr '[pterm] This plugin requires +popupwin feature.'
   finish
-elseif v:versionlong < 821900
-  echoerr 'This plugin requires version8.2.1900 or above.'
+elseif v:versionlong < 8021900
+  echoerr '[pterm] This plugin requires version8.2.1900 or above.'
   finish
 endif
 
