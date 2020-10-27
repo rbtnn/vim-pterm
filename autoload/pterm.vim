@@ -24,7 +24,7 @@ function! pterm#open(q_bang, q_args, count) abort
         endif
       endif
       if new_term
-        let args = empty(a:q_args) ? [&shell] : split(a:q_args, ' ')
+        let args = empty(a:q_args) ? &shell : a:q_args
         let bnr = term_start(args, #{
           \   hidden: 1,
           \   term_finish: 'close',
