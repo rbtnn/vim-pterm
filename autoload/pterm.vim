@@ -124,25 +124,27 @@ function! s:show_tabs() abort
   call s:hide_tabs()
   let winid = s:get_winid_of_pterm()
   let pos = popup_getpos(winid)
-  let tab_winids = []
-  let offset = 0
-  for n in pterm#list()
-    let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
-    if n == bufnr()
-      let text = printf(' [%s%d] ', pinned_text, n)
-      let high = 'PTermSel'
-    else
-      let text = printf(' %s%d ', pinned_text, n)
-      let high = 'PTerm'
-    endif
-    let tab_winids += [popup_create(text, #{
-      \ highlight: high,
-      \ line: pos['line'] - 1,
-      \ col: pos['col'] + offset,
-      \ })]
-    let offset += len(text)
-  endfor
-  call setwinvar(winid, 'tab_winids', tab_winids)
+  if 1 < pos['line'] - 1
+    let tab_winids = []
+    let offset = 0
+    for n in pterm#list()
+      let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
+      if n == bufnr()
+        let text = printf(' [%s%d] ', pinned_text, n)
+        let high = 'PTermSel'
+      else
+        let text = printf(' %s%d ', pinned_text, n)
+        let high = 'PTerm'
+      endif
+      let tab_winids += [popup_create(text, #{
+        \ highlight: high,
+        \ line: pos['line'] - 1,
+        \ col: pos['col'] + offset,
+        \ })]
+      let offset += len(text)
+    endfor
+    call setwinvar(winid, 'tab_winids', tab_winids)
+  endif
 endfunction
 
 function! s:hide_tabs() abort
