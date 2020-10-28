@@ -117,7 +117,7 @@ function! s:show_tabs() abort
   call s:hide_tabs()
   let winid = s:get_winid_of_pterm()
   let pos = popup_getpos(winid)
-  let pinned_winids = []
+  let tab_winids = []
   let offset = 0
   for n in term_list()
     let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
@@ -128,20 +128,21 @@ function! s:show_tabs() abort
       let text = printf(' %s%d ', pinned_text, n)
       let high = 'PTerm'
     endif
-    let pinned_winids += [popup_create(text, #{
+    let tab_winids += [popup_create(text, #{
       \ highlight: high,
       \ line: pos['line'] - 1,
       \ col: pos['col'] + offset,
       \ })]
     let offset += len(text)
   endfor
-  call setwinvar(winid, 'pinned_winids', pinned_winids)
+  call setwinvar(winid, 'tab_winids', tab_winids)
 endfunction
 
 function! s:hide_tabs() abort
   let winid = s:get_winid_of_pterm()
-  for n in getwinvar(winid, 'pinned_winids', [])
+  for n in getwinvar(winid, 'tab_winids', [])
     call popup_close(n)
   endfor
+  call setwinvar(winid, 'tab_winids', [])
 endfunction
 
