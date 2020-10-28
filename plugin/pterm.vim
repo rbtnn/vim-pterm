@@ -15,7 +15,8 @@ endif
 
 command! -count=0 -bang -nargs=? PTermOpen   call pterm#open(<q-bang>, <q-args>, <count>)
 
-highlight default link PTermPin TabLineSel
+highlight default link PTerm    TabLine
+highlight default link PTermSel TabLineSel
 
 if get(g:, 'pterm_default_keymappings', v:true)
   tnoremap <silent><C-z>   <C-w>:<C-u>PTermHide<cr>

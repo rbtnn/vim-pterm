@@ -4,8 +4,7 @@ function! pterm#open(q_bang, q_args, count) abort
 
   call pterm#hide()
 
-  " Do not show pterm if current window is pterm.
-  if reopen
+  if reopen || ('!' == a:q_bang) || !empty(a:q_args) || (-1 != index(term_list(), a:count))
     let pinned_bnr = get(t:, 'pterm_pinned', 0)
     let bnr = -1
     if -1 != index(term_list(), a:count)
@@ -29,7 +28,7 @@ function! pterm#open(q_bang, q_args, count) abort
           \   hidden: 1,
           \   term_finish: 'close',
           \   term_kill: empty(a:q_args) ? 'term' : '',
-          \   exit_cb: function('pterm#exit_cb'),
+          \   exit_cb: function('s:exit_cb'),
           \ })
       endif
     endif
@@ -42,51 +41,62 @@ function! pterm#open(q_bang, q_args, count) abort
         \   maxwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
         \ }, get(g:, 'pterm_options', {}))
       let winid = popup_create(bnr, options)
-      if -1 != index(term_list(), pinned_bnr)
-        call pterm#pin(v:false, v:false)
-      endif
-      command! -buffer -nargs=0 PTermPin      call pterm#pin(v:false, v:true)
+      call s:show_tabs()
+      command! -buffer -nargs=0 PTermPin      call pterm#pin()
       command! -buffer -nargs=0 PTermHide     call pterm#hide()
+      command! -buffer -nargs=0 PTermNext     call pterm#next()
+      command! -buffer -nargs=0 PTermPrevious call pterm#previous()
+      if get(g:, 'pterm_default_extra_keymappings', v:true)
+        tnoremap <buffer><silent>gt          <C-w>:<C-u>PTermNext<cr>
+        tnoremap <buffer><silent>gT          <C-w>:<C-u>PTermPrevious<cr>
+      endif
     endif
   endif
-endfunction
-
-function! pterm#exit_cb(ch, msg) abort
-  call pterm#hide()
 endfunction
 
 function! pterm#hide() abort
   let winid = s:get_winid_of_pterm()
   if 0 < winid
-    call pterm#pin(v:true, v:false)
+    call s:hide_tabs()
     call popup_close(winid)
   endif
 endfunction
 
-function! pterm#pin(hide, toggle) abort
-  if a:toggle
-    let pinned_bnr = get(t:, 'pterm_pinned', 0)
-    if -1 != index(term_list(), pinned_bnr)
-      silent! unlet t:pterm_pinned
-    else
-      let t:pterm_pinned = bufnr()
+function! pterm#pin() abort
+  let pinned_bnr = get(t:, 'pterm_pinned', 0)
+  if -1 != index(term_list(), pinned_bnr)
+    silent! unlet t:pterm_pinned
+  else
+    let t:pterm_pinned = bufnr()
+  endif
+  call s:show_tabs()
+endfunction
+
+function! pterm#next() abort
+  let winid = s:get_winid_of_pterm()
+  if 0 < winid
+    let xs = term_list()
+    if 1 < len(xs)
+      let i = index(xs, bufnr()) + 1
+      if len(xs) == i
+        let i = 0
+      endif
+      call pterm#open('', '', xs[i])
     endif
   endif
+endfunction
 
+function! pterm#previous() abort
   let winid = s:get_winid_of_pterm()
-
-  if a:hide || !exists('t:pterm_pinned')
-    let pinned_winid = getwinvar(winid, 'pinned_winid', 0)
-    if 0 < pinned_winid
-      call popup_close(pinned_winid)
+  if 0 < winid
+    let xs = term_list()
+    if 1 < len(xs)
+      let i = index(xs, bufnr()) - 1
+      if -1 == i
+        let i = len(xs) - 1
+      endif
+      call pterm#open('', '', xs[i])
     endif
-  else
-    let pos = popup_getpos(winid)
-    call setwinvar(winid, 'pinned_winid', popup_create(printf('[Pinned:%d]', bufnr()), #{
-      \ highlight: 'PTermPin',
-      \ line: pos['line'] - 1,
-      \ col: pos['col'],
-      \ }))
   endif
 endfunction
 
@@ -97,5 +107,41 @@ function! s:get_winid_of_pterm() abort
     endif
   endfor
   return 0
+endfunction
+
+function! s:exit_cb(ch, msg) abort
+  call pterm#hide()
+endfunction
+
+function! s:show_tabs() abort
+  call s:hide_tabs()
+  let winid = s:get_winid_of_pterm()
+  let pos = popup_getpos(winid)
+  let pinned_winids = []
+  let offset = 0
+  for n in term_list()
+    let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
+    if n == bufnr()
+      let text = printf(' [%s%d] ', pinned_text, n)
+      let high = 'PTermSel'
+    else
+      let text = printf(' %s%d ', pinned_text, n)
+      let high = 'PTerm'
+    endif
+    let pinned_winids += [popup_create(text, #{
+      \ highlight: high,
+      \ line: pos['line'] - 1,
+      \ col: pos['col'] + offset,
+      \ })]
+    let offset += len(text)
+  endfor
+  call setwinvar(winid, 'pinned_winids', pinned_winids)
+endfunction
+
+function! s:hide_tabs() abort
+  let winid = s:get_winid_of_pterm()
+  for n in getwinvar(winid, 'pinned_winids', [])
+    call popup_close(n)
+  endfor
 endfunction
 

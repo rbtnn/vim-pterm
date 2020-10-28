@@ -37,6 +37,14 @@ This command is defined only in a terminal buffer of `:PTermOpen`.
 Pin/Unpin the terminal-buffer to current tabpage.  
 This command is defined only in a terminal buffer of `:PTermOpen`.  
 
+### :PTermNext
+Switch to the next terminal-buffer. This is similar to `:bnext`.  
+This command is defined only in a terminal buffer of `:PTermOpen`.  
+
+### :PTermPrevious
+Switch to the next terminal-buffer. This is similar to `:bprevious`.  
+This command is defined only in a terminal buffer of `:PTermOpen`.  
+
 ## Keymappings
 This plugin provides following keymappings. These keymappings can toggle it.  
 If you do not want to these keymappings, please set `g:pterm_default_keymappings` to `v:false`.  
@@ -44,6 +52,14 @@ If you do not want to these keymappings, please set `g:pterm_default_keymappings
 ```
 tnoremap <silent><C-z>   <C-w>:<C-u>PTermHide<cr>
 nnoremap <silent><C-z>   :<C-u>PTermOpen<cr>
+```
+
+Also this plugin provides following keymappings only in a terminal buffer of `:PTermOpen`.  
+If you do not want to these keymappings, please set `g:pterm_default_extra_keymappings` to `v:false`.  
+
+```
+tnoremap <buffer><silent>gt   <C-w>:<C-u>PTermNext<cr>
+nnoremap <buffer><silent>gT   <C-w>:<C-u>PTermPrevious<cr>
 ```
 
 ## Installation
