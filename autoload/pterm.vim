@@ -7,19 +7,19 @@ function! pterm#open(q_bang, q_args, count) abort
   if reopen || ('!' == a:q_bang) || !empty(a:q_args) || (-1 != index(term_list(), a:count))
     let pinned_bnr = get(t:, 'pterm_pinned', 0)
     let bnr = -1
-    if -1 != index(term_list(), a:count)
+    if -1 != index(pterm#list(), a:count)
       let bnr = a:count
     else
       let new_term = v:false
       if ('!' == a:q_bang) || !empty(a:q_args)
         let new_term = v:true
       else
-        if empty(term_list())
+        if empty(pterm#list())
           let new_term = v:true
-        elseif -1 != index(term_list(), pinned_bnr)
+        elseif -1 != index(pterm#list(), pinned_bnr)
           let bnr = pinned_bnr
         else
-          let bnr = term_list()[0]
+          let bnr = pterm#list()[0]
         endif
       endif
       if new_term
@@ -64,7 +64,7 @@ endfunction
 
 function! pterm#pin() abort
   let pinned_bnr = get(t:, 'pterm_pinned', 0)
-  if -1 != index(term_list(), pinned_bnr)
+  if -1 != index(pterm#list(), pinned_bnr)
     silent! unlet t:pterm_pinned
   else
     let t:pterm_pinned = bufnr()
@@ -75,7 +75,7 @@ endfunction
 function! pterm#next() abort
   let winid = s:get_winid_of_pterm()
   if 0 < winid
-    let xs = term_list()
+    let xs = pterm#list()
     if 1 < len(xs)
       let i = index(xs, bufnr()) + 1
       if len(xs) == i
@@ -89,7 +89,7 @@ endfunction
 function! pterm#previous() abort
   let winid = s:get_winid_of_pterm()
   if 0 < winid
-    let xs = term_list()
+    let xs = pterm#list()
     if 1 < len(xs)
       let i = index(xs, bufnr()) - 1
       if -1 == i
@@ -98,6 +98,13 @@ function! pterm#previous() abort
       call pterm#open('', '', xs[i])
     endif
   endif
+endfunction
+
+function! pterm#list() abort
+    let xs = term_list()
+    let showterms = map(filter(getwininfo(), { i,x -> x['terminal'] }), { i,x -> x['bufnr'] })
+    call filter(xs, { i,x -> -1 == index(showterms, x) })
+    return xs
 endfunction
 
 function! s:get_winid_of_pterm() abort
@@ -119,7 +126,7 @@ function! s:show_tabs() abort
   let pos = popup_getpos(winid)
   let tab_winids = []
   let offset = 0
-  for n in term_list()
+  for n in pterm#list()
     let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
     if n == bufnr()
       let text = printf(' [%s%d] ', pinned_text, n)
