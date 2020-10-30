@@ -57,6 +57,9 @@ function! pterm#open(...) abort
         tnoremap <buffer><silent>gt          <C-w>:<C-u>PTermNext<cr>
         tnoremap <buffer><silent>gT          <C-w>:<C-u>PTermPrevious<cr>
       endif
+      if 'n' == mode()
+        call call('cursor', get(b:, 'pterm_last_curpos', [1, 1]))
+      endif
     endif
   endif
 endfunction
@@ -64,6 +67,9 @@ endfunction
 function! pterm#hide() abort
   let winid = s:get_winid_of_pterm()
   if 0 < winid
+    if 'n' == mode()
+      let b:pterm_last_curpos = getcurpos()[1:2]
+    endif
     call s:hide_tabs()
     call popup_close(winid)
   endif
