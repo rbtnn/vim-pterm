@@ -22,16 +22,14 @@ Commands                                                      *pterm-commands*
 		3. Set {arguments}:
 			Open a new terminal of {arguments} in a popup window.
 			e.g. `:PTermOpen powershell`, `:PTermOpen sh`
-		4. Pinned:
-			Open the terminal-buffer in a popup window if a pinned
-			terminal-buffer exists.
-		5. Otherwise:
-			Open the first of existing terminal-buffers in a popup
-			window. If terminal-buffer does not exist, open a new
-			terminal in a popup window.
+		4. Otherwise:
+			Open the recent terminal-buffer of the current tabpage
+			in a popup window. If terminal-buffer does not exist,
+			open a new terminal in a popup window.
 
 		Height of the popup window is: >
-			eval(get(g:, 'pterm_height', '(&lines - 2 - &cmdheight) * 2 / 3'))
+			eval(get(g:, 'pterm_height',
+			'(&lines - 2 - &cmdheight) * 2 / 3'))
 <
 		Width of the popup window is: >
 			eval(get(g:, 'pterm_width', '&columns * 2 / 3'))
@@ -43,12 +41,6 @@ Commands                                                      *pterm-commands*
                                                                   *:PTermHide*
 :PTermHide
 		Close the popup window opened by |:PTermOpen|.
-		This command is defined only in a terminal buffer of
-		|:PTermOpen|.
-
-                                                                   *:PTermPin*
-:PTermPin
-		Pin/Unpin the terminal-buffer to current tabpage.
 		This command is defined only in a terminal buffer of
 		|:PTermOpen|.
 

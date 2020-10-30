@@ -17,11 +17,8 @@ This plugin provides to open and hide terminal in a popup window.
     Open a new terminal of {arguments} in a popup window.  
     e.g. `:PTermOpen powershell`, `:PTermOpen sh`  
 
-4. __Pinned:__  
-    Open the terminal-buffer in a popup window if a pinned terminal-buffer exists.
-
-5. __Otherwise:__  
-    Open the first of existing terminal-buffers in a popup window.   
+4. __Otherwise:__  
+    Open the recent terminal-buffer of the current tabpage in a popup window.   
     If terminal-buffer does not exist, open a new terminal in a popup window.  
 
 Height of the popup window is `eval(get(g:, 'pterm_height', '(&lines - 2 - &cmdheight) * 2 / 3'))`.  
@@ -31,10 +28,6 @@ e.g. `:let g:pterm_options = { 'border' : [], }`
 
 ### :PTermHide
 Close the popup window opened by `:PTermOpen`.  
-This command is defined only in a terminal buffer of `:PTermOpen`.  
-
-### :PTermPin
-Pin/Unpin the terminal-buffer to current tabpage.  
 This command is defined only in a terminal buffer of `:PTermOpen`.  
 
 ### :PTermNext

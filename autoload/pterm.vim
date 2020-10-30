@@ -9,7 +9,6 @@ function! pterm#open(...) abort
   call pterm#hide()
 
   if reopen || ('!' == q_bang) || !empty(q_args) || (-1 != index(pterm#list(), term_bufnr))
-    let pinned_bnr = get(t:, 'pterm_pinned', 0)
     let bnr = -1
     if -1 != index(pterm#list(), term_bufnr)
       let bnr = term_bufnr
@@ -20,10 +19,11 @@ function! pterm#open(...) abort
       else
         if empty(pterm#list())
           let new_term = v:true
-        elseif -1 != index(pterm#list(), pinned_bnr)
-          let bnr = pinned_bnr
         else
-          let bnr = pterm#list()[0]
+          let bnr = get(t:, 'pterm_last_bufnr', 0)
+          if -1 == index(pterm#list(), bnr)
+            let bnr = pterm#list()[0]
+          endif
         endif
       endif
       if new_term
@@ -60,7 +60,6 @@ function! pterm#open(...) abort
         \ }, get(g:, 'pterm_options', {}))
       let winid = popup_create(bnr, options)
       call s:show_tabs()
-      command! -buffer -nargs=0 PTermPin      call pterm#pin()
       command! -buffer -nargs=0 PTermHide     call pterm#hide()
       command! -buffer -nargs=0 PTermNext     call pterm#next()
       command! -buffer -nargs=0 PTermPrevious call pterm#previous()
@@ -82,19 +81,10 @@ function! pterm#hide() abort
     if 'n' == mode()
       let b:pterm_last_curpos = getcurpos()[1:2]
     endif
+    let t:pterm_last_bufnr = bufnr()
     call s:hide_tabs()
     call popup_close(winid)
   endif
-endfunction
-
-function! pterm#pin() abort
-  let pinned_bnr = get(t:, 'pterm_pinned', 0)
-  if -1 != index(pterm#list(), pinned_bnr)
-    silent! unlet t:pterm_pinned
-  else
-    let t:pterm_pinned = bufnr()
-  endif
-  call s:show_tabs()
 endfunction
 
 function! pterm#next() abort
@@ -166,16 +156,15 @@ function! s:show_tabs() abort
     let offset = 0
     let xs = []
     for n in pterm#list()
-      let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
       if n == bufnr()
         let xs += [#{
-          \ text: printf(' [%s%d] ', pinned_text, n),
+          \ text: printf(' [%d] ', n),
           \ high: 'PTermSel',
           \ offset: offset,
           \ }]
       else
         let xs += [#{
-          \ text: printf('  %s%d  ', pinned_text, n),
+          \ text: printf('  %d  ', n),
           \ high: 'PTerm',
           \ offset: offset,
           \ }]
