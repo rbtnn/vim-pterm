@@ -53,10 +53,10 @@ function! pterm#open(...) abort
       command! -buffer -nargs=0 PTermNext     call pterm#next()
       command! -buffer -nargs=0 PTermPrevious call pterm#previous()
       if get(g:, 'pterm_default_extra_keymappings', v:true)
+        tnoremap <buffer><silent><C-t>       <C-w>:<C-u>PTermOpen!<cr>
         tnoremap <buffer><silent>gt          <C-w>:<C-u>PTermNext<cr>
         tnoremap <buffer><silent>gT          <C-w>:<C-u>PTermPrevious<cr>
       endif
-      redraw!
     endif
   endif
 endfunction
@@ -129,6 +129,7 @@ function! s:exit_cb(ch, msg) abort
     call pterm#hide()
   else
     call pterm#open(xs[0])
+    redraw
   endif
 endfunction
 

@@ -84,8 +84,9 @@ Also this plugin provides following keymappings only in a terminal buffer of
 |:PTermOpen|. If you do not want to these keymappings, please set
 |g:pterm_default_extra_keymappings| to `v:false`.
 >
-	tnoremap <buffer><silent>gt   <C-w>:<C-u>PTermNext<cr>
-	nnoremap <buffer><silent>gT   <C-w>:<C-u>PTermPrevious<cr>
+	tnoremap <buffer><silent><C-t>       <C-w>:<C-u>PTermOpen!<cr>
+	tnoremap <buffer><silent>gt          <C-w>:<C-u>PTermNext<cr>
+	nnoremap <buffer><silent>gT          <C-w>:<C-u>PTermPrevious<cr>
 <
 
 
