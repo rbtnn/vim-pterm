@@ -57,6 +57,7 @@ function! pterm#open(...) abort
         \   minheight: height, maxheight: height,
         \   minwidth: width, maxwidth: width,
         \   line: line, col: col,
+        \   callback: function('s:popup_cb'),
         \ }, get(g:, 'pterm_options', {}))
       let winid = popup_create(bnr, options)
       call s:show_tabs()
@@ -145,6 +146,10 @@ function! s:exit_cb(ch, msg) abort
     endif
     redraw
   endif
+endfunction
+
+function! s:popup_cb(id, result) abort
+  call s:hide_tabs()
 endfunction
 
 function! s:show_tabs() abort
