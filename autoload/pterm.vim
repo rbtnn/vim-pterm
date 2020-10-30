@@ -1,17 +1,21 @@
 
-function! pterm#open(q_bang, q_args, count) abort
+function! pterm#open(...) abort
+  let term_bufnr = get(a:000, 0, 0)
+  let q_bang = get(a:000, 1, '')
+  let q_args = get(a:000, 2, '')
+
   let reopen = (-1 == index(popup_list(), win_getid()))
 
   call pterm#hide()
 
-  if reopen || ('!' == a:q_bang) || !empty(a:q_args) || (-1 != index(term_list(), a:count))
+  if reopen || ('!' == q_bang) || !empty(q_args) || (-1 != index(pterm#list(), term_bufnr))
     let pinned_bnr = get(t:, 'pterm_pinned', 0)
     let bnr = -1
-    if -1 != index(pterm#list(), a:count)
-      let bnr = a:count
+    if -1 != index(pterm#list(), term_bufnr)
+      let bnr = term_bufnr
     else
       let new_term = v:false
-      if ('!' == a:q_bang) || !empty(a:q_args)
+      if ('!' == q_bang) || !empty(q_args)
         let new_term = v:true
       else
         if empty(pterm#list())
@@ -23,11 +27,11 @@ function! pterm#open(q_bang, q_args, count) abort
         endif
       endif
       if new_term
-        let args = empty(a:q_args) ? &shell : a:q_args
+        let args = empty(q_args) ? &shell : q_args
         let bnr = term_start(args, #{
           \   hidden: 1,
           \   term_finish: 'close',
-          \   term_kill: empty(a:q_args) ? 'term' : '',
+          \   term_kill: empty(q_args) ? 'term' : '',
           \   exit_cb: function('s:exit_cb'),
           \ })
       endif
@@ -50,6 +54,7 @@ function! pterm#open(q_bang, q_args, count) abort
         tnoremap <buffer><silent>gt          <C-w>:<C-u>PTermNext<cr>
         tnoremap <buffer><silent>gT          <C-w>:<C-u>PTermPrevious<cr>
       endif
+      redraw!
     endif
   endif
 endfunction
@@ -81,7 +86,7 @@ function! pterm#next() abort
       if len(xs) == i
         let i = 0
       endif
-      call pterm#open('', '', xs[i])
+      call pterm#open(xs[i])
     endif
   endif
 endfunction
@@ -95,7 +100,7 @@ function! pterm#previous() abort
       if -1 == i
         let i = len(xs) - 1
       endif
-      call pterm#open('', '', xs[i])
+      call pterm#open(xs[i])
     endif
   endif
 endfunction
@@ -117,7 +122,12 @@ function! s:get_winid_of_pterm() abort
 endfunction
 
 function! s:exit_cb(ch, msg) abort
-  call pterm#hide()
+  let xs = filter(pterm#list(), { i,x -> 'finished' != term_getstatus(x) })
+  if empty(xs)
+    call pterm#hide()
+  else
+    call pterm#open(xs[0])
+  endif
 endfunction
 
 function! s:show_tabs() abort

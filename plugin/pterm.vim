@@ -13,7 +13,7 @@ elseif v:versionlong < 8021900
   finish
 endif
 
-command! -count=0 -bang -nargs=? PTermOpen   call pterm#open(<q-bang>, <q-args>, <count>)
+command! -count=0 -bang -nargs=? PTermOpen   call pterm#open(<count>, <q-bang>, <q-args>)
 
 highlight default link PTerm    TabLine
 highlight default link PTermSel TabLineSel
