@@ -30,6 +30,7 @@ function! pterm#open(...) abort
         let args = empty(q_args) ? &shell : q_args
         let bnr = term_start(args, #{
           \   hidden: 1,
+          \   term_highlight: get(g:, 'pterm_term_highlight', 'Terminal'),
           \   term_finish: 'close',
           \   term_kill: empty(q_args) ? 'term' : '',
           \   exit_cb: function('s:exit_cb'),
@@ -39,6 +40,7 @@ function! pterm#open(...) abort
     if -1 != bnr
       let options = extend(#{
         \   pos: 'center',
+        \   highlight: get(g:, 'pterm_term_highlight', 'Terminal'),
         \   minheight: eval(get(g:, 'pterm_height', '&lines * 2 / 3')),
         \   maxheight: eval(get(g:, 'pterm_height', '&lines * 2 / 3')),
         \   minwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
@@ -106,10 +108,10 @@ function! pterm#previous() abort
 endfunction
 
 function! pterm#list() abort
-    let xs = term_list()
-    let showterms = map(filter(getwininfo(), { i,x -> x['terminal'] }), { i,x -> x['bufnr'] })
-    call filter(xs, { i,x -> -1 == index(showterms, x) })
-    return xs
+  let xs = term_list()
+  let showterms = map(filter(getwininfo(), { i,x -> x['terminal'] }), { i,x -> x['bufnr'] })
+  call filter(xs, { i,x -> -1 == index(showterms, x) })
+  return xs
 endfunction
 
 function! s:get_winid_of_pterm() abort
