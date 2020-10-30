@@ -38,13 +38,25 @@ function! pterm#open(...) abort
       endif
     endif
     if -1 != bnr
+      let width = eval(get(g:, 'pterm_width', '&columns * 2 / 3'))
+      let height = eval(get(g:, 'pterm_height', '(&lines - 2 - &cmdheight) * 2 / 3'))
+      let line = eval(get(g:, 'pterm_line', '(&lines - eval(height)) / 2'))
+      let col = eval(get(g:, 'pterm_col', '(&columns - eval(width)) / 2'))
+      let tabline_height = (2 == &showtabline) || ((1 == &showtabline) && (1 < tabpagenr()))
+      let statusline_height = 1
+      let tabs_height = 1
+      if line < 1 + tabs_height + tabline_height
+        let line = 1 + tabs_height + tabline_height
+      endif
+      if &lines < height + tabs_height + tabline_height + statusline_height + &cmdheight
+        let height = &lines - tabs_height - tabline_height - statusline_height - &cmdheight
+      endif
       let options = extend(#{
-        \   pos: 'center',
+        \   pos: 'topleft',
         \   highlight: get(g:, 'pterm_term_highlight', 'Terminal'),
-        \   minheight: eval(get(g:, 'pterm_height', '&lines * 2 / 3')),
-        \   maxheight: eval(get(g:, 'pterm_height', '&lines * 2 / 3')),
-        \   minwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
-        \   maxwidth: eval(get(g:, 'pterm_width', '&columns * 2 / 3')),
+        \   minheight: height, maxheight: height,
+        \   minwidth: width, maxwidth: width,
+        \   line: line, col: col,
         \ }, get(g:, 'pterm_options', {}))
       let winid = popup_create(bnr, options)
       call s:show_tabs()
@@ -90,9 +102,9 @@ function! pterm#next() abort
   if 0 < winid
     let xs = pterm#list()
     if 1 < len(xs)
-      let i = index(xs, bufnr()) + 1
-      if len(xs) == i
-        let i = 0
+      let i = index(xs, bufnr()) - 1
+      if -1 == i
+        let i = len(xs) - 1
       endif
       call pterm#open(xs[i])
     endif
@@ -104,9 +116,9 @@ function! pterm#previous() abort
   if 0 < winid
     let xs = pterm#list()
     if 1 < len(xs)
-      let i = index(xs, bufnr()) - 1
-      if -1 == i
-        let i = len(xs) - 1
+      let i = index(xs, bufnr()) + 1
+      if len(xs) == i
+        let i = 0
       endif
       call pterm#open(xs[i])
     endif
@@ -130,11 +142,17 @@ function! s:get_winid_of_pterm() abort
 endfunction
 
 function! s:exit_cb(ch, msg) abort
-  let xs = filter(pterm#list(), { i,x -> 'finished' != term_getstatus(x) })
+  let xs = pterm#list()
+  let i = index(xs, bufnr())
+  call filter(xs, { i,x -> 'finished' != term_getstatus(x) })
   if empty(xs)
     call pterm#hide()
   else
-    call pterm#open(xs[0])
+    if 0 <= i - 1
+      call pterm#open(xs[i - 1])
+    else
+      call pterm#open(xs[0])
+    endif
     redraw
   endif
 endfunction
@@ -143,24 +161,33 @@ function! s:show_tabs() abort
   call s:hide_tabs()
   let winid = s:get_winid_of_pterm()
   let pos = popup_getpos(winid)
-  if 1 < pos['line'] - 1
+  if 1 <= pos['line'] - 1
     let tab_winids = []
     let offset = 0
+    let xs = []
     for n in pterm#list()
       let pinned_text = (get(t:, 'pterm_pinned', 0) == n) ? '*' : ''
       if n == bufnr()
-        let text = printf(' [%s%d] ', pinned_text, n)
-        let high = 'PTermSel'
+        let xs += [#{
+          \ text: printf(' [%s%d] ', pinned_text, n),
+          \ high: 'PTermSel',
+          \ offset: offset,
+          \ }]
       else
-        let text = printf(' %s%d ', pinned_text, n)
-        let high = 'PTerm'
+        let xs += [#{
+          \ text: printf('  %s%d  ', pinned_text, n),
+          \ high: 'PTerm',
+          \ offset: offset,
+          \ }]
       endif
-      let tab_winids += [popup_create(text, #{
-        \ highlight: high,
+      let offset += len(xs[-1]['text'])
+    endfor
+    for x in xs
+      let tab_winids += [popup_create(x['text'], #{
+        \ highlight: x['high'],
         \ line: pos['line'] - 1,
-        \ col: pos['col'] + offset,
+        \ col: pos['col'] + (offset - x['offset'] - len(x['text'])),
         \ })]
-      let offset += len(text)
     endfor
     call setwinvar(winid, 'tab_winids', tab_winids)
   endif

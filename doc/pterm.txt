@@ -31,7 +31,7 @@ Commands                                                      *pterm-commands*
 			terminal in a popup window.
 
 		Height of the popup window is: >
-			eval(get(g:, 'pterm_height', '&lines * 2 / 3'))
+			eval(get(g:, 'pterm_height', '(&lines - 2 - &cmdheight) * 2 / 3'))
 <
 		Width of the popup window is: >
 			eval(get(g:, 'pterm_width', '&columns * 2 / 3'))

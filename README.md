@@ -24,7 +24,7 @@ This plugin provides to open and hide terminal in a popup window.
     Open the first of existing terminal-buffers in a popup window.   
     If terminal-buffer does not exist, open a new terminal in a popup window.  
 
-Height of the popup window is `eval(get(g:, 'pterm_height', '&lines * 2 / 3'))`.  
+Height of the popup window is `eval(get(g:, 'pterm_height', '(&lines - 2 - &cmdheight) * 2 / 3'))`.  
 Width of the popup window is `eval(get(g:, 'pterm_width', '&columns * 2 / 3'))`.  
 The way to set other options of the popup window is to set `g:pterm_options`.  
 e.g. `:let g:pterm_options = { 'border' : [], }`  
