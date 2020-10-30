@@ -35,7 +35,7 @@ Switch to the next terminal-buffer. This is similar to `:bnext`.
 This command is defined only in a terminal buffer of `:PTermOpen`.  
 
 ### :PTermPrevious
-Switch to the next terminal-buffer. This is similar to `:bprevious`.  
+Switch to the previous terminal-buffer. This is similar to `:bprevious`.  
 This command is defined only in a terminal buffer of `:PTermOpen`.  
 
 ## Keymappings

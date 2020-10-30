@@ -53,7 +53,7 @@ Commands                                                      *pterm-commands*
 
                                                               *:PTermPrevious*
 :PTermPrevious
-		Switch to the next terminal-buffer. This is similar to
+		Switch to the previous terminal-buffer. This is similar to
 		|:bprevious|.
 		This command is defined only in a terminal buffer of
 		|:PTermOpen|.
