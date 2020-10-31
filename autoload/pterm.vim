@@ -148,7 +148,7 @@ function! s:exit_cb(ch, msg) abort
 endfunction
 
 function! s:popup_cb(winid, result) abort
-  let t:pterm_recent_bufnr = get(get(getwininfo(a:winid), 0, {}), 'bufnr', 0)
+  let t:pterm_recent_bufnr = winbufnr(a:winid)
   if 0 != t:pterm_recent_bufnr
     call setbufvar(t:pterm_recent_bufnr, 'pterm_recent_topline', get(get(getwininfo(a:winid), 0, {}), 'topline', 1))
     call setbufvar(t:pterm_recent_bufnr, 'pterm_recent_curpos', getcurpos(a:winid))
