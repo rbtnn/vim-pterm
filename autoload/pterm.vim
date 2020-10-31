@@ -20,7 +20,7 @@ function! pterm#open(...) abort
         if empty(pterm#list())
           let new_term = v:true
         else
-          let bnr = get(t:, 'pterm_last_bufnr', 0)
+          let bnr = get(t:, 'pterm_recent_bufnr', 0)
           if -1 == index(pterm#list(), bnr)
             let bnr = pterm#list()[0]
           endif
@@ -70,7 +70,11 @@ function! pterm#open(...) abort
         tnoremap <buffer><silent>gT          <C-w>:<C-u>PTermPrevious<cr>
       endif
       if 'n' == mode()
-        call call('cursor', get(b:, 'pterm_last_curpos', [1, 1]))
+        let n = get(b:, 'pterm_recent_topline', 1) - 1
+        if 0 < n
+          call feedkeys(printf("gg%d\<C-e>", n), 'xn')
+        endif
+        call setpos('.', get(b:, 'pterm_recent_curpos', []))
       endif
     endif
   endif
@@ -79,11 +83,6 @@ endfunction
 function! pterm#hide() abort
   let winid = s:get_winid_of_pterm()
   if 0 < winid
-    if 'n' == mode()
-      let b:pterm_last_curpos = getcurpos()[1:2]
-    endif
-    let t:pterm_last_bufnr = bufnr()
-    call s:hide_tabs()
     call popup_close(winid)
   endif
 endfunction
@@ -148,7 +147,12 @@ function! s:exit_cb(ch, msg) abort
   endif
 endfunction
 
-function! s:popup_cb(id, result) abort
+function! s:popup_cb(winid, result) abort
+  let t:pterm_recent_bufnr = get(get(getwininfo(a:winid), 0, {}), 'bufnr', 0)
+  if 0 != t:pterm_recent_bufnr
+    call setbufvar(t:pterm_recent_bufnr, 'pterm_recent_topline', get(get(getwininfo(a:winid), 0, {}), 'topline', 1))
+    call setbufvar(t:pterm_recent_bufnr, 'pterm_recent_curpos', getcurpos(a:winid))
+  endif
   call s:hide_tabs()
 endfunction
 
