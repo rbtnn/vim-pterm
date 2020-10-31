@@ -58,7 +58,7 @@ function! pterm#open(...) abort
         \   minwidth: width, maxwidth: width,
         \   line: line, col: col,
         \   callback: function('s:popup_cb'),
-        \ }, get(g:, 'pterm_options', {}))
+        \ }, get(g:, 'pterm_options', {}), 'force')
       let winid = popup_create(bnr, options)
       call s:show_tabs()
       command! -buffer -nargs=0 PTermHide     call pterm#hide()
@@ -161,7 +161,6 @@ function! s:show_tabs() abort
   let winid = s:get_winid_of_pterm()
   let pos = popup_getpos(winid)
   if 1 <= pos['line'] - 1
-    let tab_winids = []
     let offset = 0
     let xs = []
     for n in pterm#list()
@@ -180,22 +179,34 @@ function! s:show_tabs() abort
       endif
       let offset += len(xs[-1]['text'])
     endfor
-    for x in xs
-      let tab_winids += [popup_create(x['text'], #{
-        \ highlight: x['high'],
-        \ line: pos['line'] - 1,
-        \ col: pos['col'] + (offset - x['offset'] - len(x['text'])),
-        \ })]
-    endfor
-    call setwinvar(winid, 'tab_winids', tab_winids)
+    if get(g:, 'pterm_using_title_for_tabs', v:false)
+      let title = ''
+      for x in xs
+        let title = x['text'] .. title
+      endfor
+      call popup_setoptions(winid, #{ title: title, })
+    else
+      let tab_winids = []
+      for x in xs
+        let tab_winids += [popup_create(x['text'], #{
+          \ highlight: x['high'],
+          \ line: pos['line'] - 1,
+          \ col: pos['col'] + (offset - x['offset'] - len(x['text'])),
+          \ })]
+      endfor
+      call setwinvar(winid, 'tab_winids', tab_winids)
+    endif
   endif
 endfunction
 
 function! s:hide_tabs() abort
-  let winid = s:get_winid_of_pterm()
-  for n in getwinvar(winid, 'tab_winids', [])
-    call popup_close(n)
-  endfor
-  call setwinvar(winid, 'tab_winids', [])
+  if get(g:, 'pterm_using_title_for_tabs', v:false)
+  else
+    let winid = s:get_winid_of_pterm()
+    for n in getwinvar(winid, 'tab_winids', [])
+      call popup_close(n)
+    endfor
+    call setwinvar(winid, 'tab_winids', [])
+  endif
 endfunction
 
