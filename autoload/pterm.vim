@@ -121,7 +121,7 @@ endfunction
 function! pterm#list() abort
     let xs = term_list()
     let showterms = map(filter(getwininfo(), { i,x -> x['terminal'] }), { i,x -> x['bufnr'] })
-    call filter(xs, { i,x -> -1 == index(showterms, x) })
+    call filter(xs, { _, x -> (-1 == index(showterms, x)) && ('finished' != term_getstatus(x)) })
     return xs
 endfunction
 
