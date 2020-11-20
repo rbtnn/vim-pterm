@@ -28,12 +28,12 @@ function! pterm#open(...) abort
             endif
             if new_term
                 let args = empty(q_args) ? &shell : q_args
-                let bnr = term_start(args, #{
-                    \   hidden: 1,
-                    \   term_highlight: get(g:, 'pterm_term_highlight', 'Terminal'),
-                    \   term_finish: 'close',
-                    \   term_kill: empty(q_args) ? 'term' : '',
-                    \   exit_cb: function('s:exit_cb'),
+                let bnr = term_start(args, {
+                    \   'hidden' : 1,
+                    \   'term_highlight' : get(g:, 'pterm_term_highlight', 'Terminal'),
+                    \   'term_finish' : 'close',
+                    \   'term_kill' : empty(q_args) ? 'term' : '',
+                    \   'exit_cb' : function('s:exit_cb'),
                     \ })
             endif
         endif
@@ -73,13 +73,13 @@ function! pterm#build_options() abort
     if &lines < height + tabs_height + tabline_height + statusline_height + &cmdheight
         let height = &lines - tabs_height - tabline_height - statusline_height - &cmdheight
     endif
-    return extend(#{
-        \   pos: 'topleft',
-        \   highlight: get(g:, 'pterm_term_highlight', 'Terminal'),
-        \   minheight: height, maxheight: height,
-        \   minwidth: width, maxwidth: width,
-        \   line: line, col: col,
-        \   callback: function('s:popup_cb'),
+    return extend({
+        \   'pos' : 'topleft',
+        \   'highlight' : get(g:, 'pterm_term_highlight', 'Terminal'),
+        \   'minheight' : height, 'maxheight' : height,
+        \   'minwidth' : width, 'maxwidth' : width,
+        \   'line' : line, 'col' : col,
+        \   'callback' : function('s:popup_cb'),
         \ }, get(g:, 'pterm_options', {}), 'force')
 endfunction
 
@@ -168,16 +168,16 @@ function! s:show_tabs() abort
         let xs = []
         for n in pterm#list()
             if n == bufnr()
-                let xs += [#{
-                    \ text: printf(' [%d] ', n),
-                    \ high: 'PTermSel',
-                    \ offset: offset,
+                let xs += [{
+                    \ 'text' : printf(' [%d] ', n),
+                    \ 'high' : 'PTermSel',
+                    \ 'offset' : offset,
                     \ }]
             else
-                let xs += [#{
-                    \ text: printf('  %d  ', n),
-                    \ high: 'PTerm',
-                    \ offset: offset,
+                let xs += [{
+                    \ 'text' : printf('  %d  ', n),
+                    \ 'high' : 'PTerm',
+                    \ 'offset' : offset,
                     \ }]
             endif
             let offset += len(xs[-1]['text'])
@@ -187,14 +187,14 @@ function! s:show_tabs() abort
             for x in xs
                 let title = x['text'] .. title
             endfor
-            call popup_setoptions(winid, #{ title: title, })
+            call popup_setoptions(winid, { 'title' : title, })
         else
             let tab_winids = []
             for x in xs
-                let tab_winids += [popup_create(x['text'], #{
-                    \ highlight: x['high'],
-                    \ line: pos['line'] - 1,
-                    \ col: pos['col'] + (offset - x['offset'] - len(x['text'])),
+                let tab_winids += [popup_create(x['text'], {
+                    \ 'highlight' : x['high'],
+                    \ 'line' : pos['line'] - 1,
+                    \ 'col' : pos['col'] + (offset - x['offset'] - len(x['text'])),
                     \ })]
             endfor
             call setwinvar(winid, 'tab_winids', tab_winids)
