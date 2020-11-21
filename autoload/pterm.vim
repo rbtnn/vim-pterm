@@ -60,20 +60,12 @@ function! pterm#open(...) abort
 endfunction
 
 function! pterm#build_options() abort
-    let width = eval(get(g:, 'pterm_width', '&columns * 2 / 3'))
-    let height = eval(get(g:, 'pterm_height', '(&lines - 2 - &cmdheight) * 2 / 3'))
-    let line = eval(get(g:, 'pterm_line', '(&lines - eval(height)) / 2'))
-    let col = eval(get(g:, 'pterm_col', '(&columns - eval(width)) / 2'))
-    let tabline_height = (2 == &showtabline) || ((1 == &showtabline) && (1 < tabpagenr()))
-    let statusline_height = 1
-    let tabs_height = 1
-    if line < 1 + tabs_height + tabline_height
-        let line = 1 + tabs_height + tabline_height
-    endif
-    if &lines < height + tabs_height + tabline_height + statusline_height + &cmdheight
-        let height = &lines - tabs_height - tabline_height - statusline_height - &cmdheight
-    endif
+    let width = &columns * 4 / 5
+    let height = &lines * 4 / 5
+    let line = (&lines - height) / 2
+    let col = (&columns - width) / 2
     return extend({
+        \   'border' : [], 'borderhighlight' : ['Label'],
         \   'pos' : 'topleft',
         \   'highlight' : get(g:, 'pterm_term_highlight', 'Terminal'),
         \   'minheight' : height, 'maxheight' : height,
@@ -156,11 +148,9 @@ function! s:popup_cb(winid, result) abort
         call setbufvar(t:pterm_recent_bufnr, 'pterm_recent_topline', get(get(getwininfo(a:winid), 0, {}), 'topline', 1))
         call setbufvar(t:pterm_recent_bufnr, 'pterm_recent_curpos', getcurpos(a:winid))
     endif
-    call s:hide_tabs()
 endfunction
 
 function! s:show_tabs() abort
-    call s:hide_tabs()
     let winid = s:get_winid_of_pterm()
     let pos = popup_getpos(winid)
     if 1 <= pos['line'] - 1
@@ -182,34 +172,11 @@ function! s:show_tabs() abort
             endif
             let offset += len(xs[-1]['text'])
         endfor
-        if get(g:, 'pterm_using_title_for_tabs', v:false)
-            let title = ''
-            for x in xs
-                let title = x['text'] .. title
-            endfor
-            call popup_setoptions(winid, { 'title' : title, })
-        else
-            let tab_winids = []
-            for x in xs
-                let tab_winids += [popup_create(x['text'], {
-                    \ 'highlight' : x['high'],
-                    \ 'line' : pos['line'] - 1,
-                    \ 'col' : pos['col'] + (offset - x['offset'] - len(x['text'])),
-                    \ })]
-            endfor
-            call setwinvar(winid, 'tab_winids', tab_winids)
-        endif
-    endif
-endfunction
-
-function! s:hide_tabs() abort
-    if get(g:, 'pterm_using_title_for_tabs', v:false)
-    else
-        let winid = s:get_winid_of_pterm()
-        for n in getwinvar(winid, 'tab_winids', [])
-            call popup_close(n)
+        let title = ''
+        for x in xs
+            let title = x['text'] .. title
         endfor
-        call setwinvar(winid, 'tab_winids', [])
+        call popup_setoptions(winid, { 'title' : title, })
     endif
 endfunction
 
