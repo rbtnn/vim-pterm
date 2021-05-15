@@ -153,7 +153,7 @@ endfunction
 function! s:show_tabs() abort
     let winid = s:get_winid_of_pterm()
     let pos = popup_getpos(winid)
-    if 1 <= pos['line'] - 1
+    if 1 <= pos['line']
         let offset = 0
         let xs = []
         for n in pterm#list()
